@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import spawn from 'cross-spawn';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
@@ -201,7 +201,8 @@ async function spawnGemini(command, options = {}, ws) {
     const geminiProcess = spawn(geminiPath, args, {
       cwd: workingDir,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env } // Inherit all environment variables
+      env: { ...process.env }, // Inherit all environment variables
+      shell: process.platform === 'win32' // Use shell on Windows
     });
     
     // Attach temp file info to process for cleanup later

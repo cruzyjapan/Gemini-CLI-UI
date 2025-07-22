@@ -32,7 +32,16 @@ import cors from 'cors';
 import { promises as fsPromises } from 'fs';
 import { spawn, execSync } from 'child_process';
 import os from 'os';
-import pty from 'node-pty';
+
+// Conditional import of node-pty for Windows compatibility
+let pty;
+try {
+  pty = await import('node-pty');
+} catch (error) {
+  console.warn(' ⚠️  Shell functionality disabled (node-pty not installed)');
+  pty = null;
+}
+
 import fetch from 'node-fetch';
 import mime from 'mime-types';
 
@@ -52,7 +61,7 @@ const connectedClients = new Set();
 // Setup file system watcher for Gemini projects folder using chokidar
 async function setupProjectsWatcher() {
   const chokidar = (await import('chokidar')).default;
-  const geminiProjectsPath = path.join(process.env.HOME, '.gemini', 'projects');
+  const geminiProjectsPath = path.join(os.homedir(), '.gemini', 'projects');
   
   if (projectsWatcher) {
     projectsWatcher.close();
@@ -553,11 +562,20 @@ function handleShellConnection(ws) {
           
           
           // Start shell using PTY for proper terminal emulation
+          if (!pty) {
+            ws.send(JSON.stringify({
+              type: 'output',
+              data: '\x1b[31mError: Terminal functionality not available (node-pty not installed)\x1b[0m\r\n'
+            }));
+            ws.close();
+            return;
+          }
+
           shellProcess = pty.spawn('bash', ['-c', shellCommand], {
             name: 'xterm-256color',
             cols: 80,
             rows: 24,
-            cwd: process.env.HOME || '/', // Start from home directory
+            cwd: os.homedir(), // Start from home directory
             env: { 
               ...process.env,
               TERM: 'xterm-256color',
