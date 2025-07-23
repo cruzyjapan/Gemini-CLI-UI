@@ -38,7 +38,7 @@ let pty;
 try {
   pty = await import('node-pty');
 } catch (error) {
-  console.warn(' ⚠️  Shell functionality disabled (node-pty not installed)');
+  console.warn(' ⚠️ Shell functionality disabled');
   pty = null;
 }
 

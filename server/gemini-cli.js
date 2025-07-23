@@ -1,8 +1,13 @@
-import spawn from 'cross-spawn';
+import { spawn as nativeSpawn } from 'child_process';
+import crossSpawn from 'cross-spawn';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
 import sessionManager from './sessionManager.js';
+
+
+// Use cross-spawn on Windows, native spawn elsewhere
+const spawnFunction = process.platform === 'win32' ? crossSpawn : nativeSpawn;
 
 let activeGeminiProcesses = new Map(); // Track active processes by session ID
 
@@ -198,7 +203,7 @@ async function spawnGemini(command, options = {}, ws) {
     const geminiPath = process.env.GEMINI_PATH || 'gemini';
     // console.log('Full command:', geminiPath, args.join(' '));
     
-    const geminiProcess = spawn(geminiPath, args, {
+    const geminiProcess = spawnFunction(geminiPath, args, {
       cwd: workingDir,
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env }, // Inherit all environment variables
