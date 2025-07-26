@@ -4,10 +4,12 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const DB_PATH = path.join(__dirname, 'geminicliui_auth.db');
+// Use DATABASE_PATH from .env if set, otherwise fallback to default
+const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, 'geminicliui_auth.db');
 const INIT_SQL_PATH = path.join(__dirname, 'init.sql');
 
 // Create database connection

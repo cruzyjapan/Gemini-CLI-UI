@@ -132,3 +132,6 @@ TestApp.jsx
 projects_data/
 session_data/
 user_uploads/
+
+
+persistent/

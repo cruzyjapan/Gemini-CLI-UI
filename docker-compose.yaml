@@ -1,0 +1,18 @@
+services:
+  gemini-webui:
+    container_name: gemini
+    build:
+      context: .
+    env_file:
+      .env
+    volumes:
+      - ./persistent/.gemini:/root/.gemini
+      - ./persistent/main:/app/main
+      - ./persistent/db:/db
+    ports:
+      - 4009:4009
+      - 4008:4008
+    # for development:
+    # entrypoint: 
+    #   - sleep
+    #   - infinity
