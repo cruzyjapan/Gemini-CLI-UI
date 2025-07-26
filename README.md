@@ -85,6 +85,56 @@ The application will start at the port you specified in your .env
 5. **Open your browser:**
    - Development: `http://localhost:4009`
 
+## Docker Deployment
+
+This project includes Docker support for easy containerization and deployment.
+
+### Prerequisites
+
+*   [Docker](https://www.docker.com/get-started/) installed and running.
+*   [Docker Compose](https://docs.docker.com/compose/install/) installed.
+
+### Building and Running with Docker Compose
+
+* The first step is to update the `.env` with the following keys :
+*   **Configure `GEMINI_API_KEY`:**
+    *   Create the directory `./persistent/.gemini` if it doesn't exist.
+    *   Create a file named `settings.json` inside `./persistent/.gemini` with the following content:
+        ```json
+        {
+          "selectedAuthType": "gemini-api-key"
+        }
+        ```
+    *   Open your `.env` file and set your Gemini API key:
+        ```
+        GEMINI_API_KEY="YOUR_ACTUAL_GEMINI_API_KEY_HERE"
+        ```
+*   **Configure `__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS` (Optional):** If you are hosting behind a reverse proxy, update your `.env` file:
+    ```
+    __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS="yourdomain.com"
+    ```
+    (Replace `yourdomain.com` with your actual domain.)
+*   **Configure `DATABASE_PATH` (Optional):** If you want to specify a custom path for the database, update your `.env` file:
+    ```
+    DATABASE_PATH="./data/my_custom_database.sqlite"
+    ```
+    (Replace `./data/my_custom_database.sqlite` with your desired path.)
+
+*  **Build and start the Docker image:**
+    ```bash
+    docker compose up -d
+    ```
+    This will start the `gemini-webui` service in detached mode.
+
+*  **Access the application:**
+    The application will be accessible via your browser at `http://localhost:4009`.
+
+### Stopping and Cleaning Up
+
+*   **Stop the services:**
+    ```bash
+    docker compose down
+    ```
 ## Security & Tools Configuration
 
 **🔒 Important Notice**: All Gemini CLI tools are **disabled by default**. This prevents potentially harmful operations from running automatically.
