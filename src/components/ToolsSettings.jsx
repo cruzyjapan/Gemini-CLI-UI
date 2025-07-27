@@ -66,7 +66,8 @@ function ToolsSettings({ isOpen, onClose }) {
   // Available Gemini models (tested and verified)
   const availableModels = [
     { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', description: 'Fast and efficient latest model (Recommended)' },
-    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', description: 'Most advanced model (Note: May have quota limits)' }
+    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', description: 'Most advanced model (Note: May have quota limits)' },
+    { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', description: 'Low cost fast model (Recommended for quick tasks)' },
   ];
 
   // MCP API functions
