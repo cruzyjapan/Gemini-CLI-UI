@@ -418,14 +418,14 @@ function Shell({ selectedProject, selectedSession, isActive }) {
         // If the config returns localhost but we're not on localhost, use current host but with API server port
         if (wsBaseUrl.includes('localhost') && !window.location.hostname.includes('localhost')) {
           const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-          // For development, API server is typically on port 4008 when Vite is on 4009
-          const apiPort = window.location.port === '4009' ? '4008' : window.location.port;
+          // En développement, le serveur API est généralement sur le port 3001 lorsque Vite est sur le port 5173
+          const apiPort = window.location.port === '5173' ? '3001' : window.location.port;
           wsBaseUrl = `${protocol}//${window.location.hostname}:${apiPort}`;
         }
       } catch (error) {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        // For development, API server is typically on port 4008 when Vite is on 4009
-        const apiPort = window.location.port === '4009' ? '4008' : window.location.port;
+        // En développement, le serveur API est généralement sur le port 3001 lorsque Vite est sur le port 5173
+        const apiPort = window.location.port === '5173' ? '3001' : window.location.port;
         wsBaseUrl = `${protocol}//${window.location.hostname}:${apiPort}`;
       }
       

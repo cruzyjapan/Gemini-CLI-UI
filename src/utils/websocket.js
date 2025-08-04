@@ -33,25 +33,25 @@ export function useWebSocket() {
       try {
         const configResponse = await fetch('/api/config', {
           headers: {
-            'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`
           }
         });
         const config = await configResponse.json();
         wsBaseUrl = config.wsUrl;
         
-        // If the config returns localhost but we're not on localhost, use current host but with API server port
+        // If the config returns localhost but we're not on localhost, use current host with API server port instead
         if (wsBaseUrl.includes('localhost') && !window.location.hostname.includes('localhost')) {
-          // console.warn('Config returned localhost, using current host with API server port instead');
+          // Config returned localhost, using current host with API server port instead
           const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-          // For development, API server is typically on port 4008 when Vite is on 4009
-          const apiPort = window.location.port === '4009' ? '4008' : window.location.port;
+          // In development, the API server is usually on port 3001 when Vite is on 5173
+          const apiPort = window.location.port === '5173' ? '3001' : window.location.port;
           wsBaseUrl = `${protocol}//${window.location.hostname}:${apiPort}`;
         }
       } catch (error) {
-        // console.warn('Could not fetch server config, falling back to current host with API server port');
+        // Could not fetch server config, falling back to current host with API server port
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        // For development, API server is typically on port 4008 when Vite is on 4009
-        const apiPort = window.location.port === '4009' ? '4008' : window.location.port;
+        // In development, the API server is usually on port 3001 when Vite is on 5173
+        const apiPort = window.location.port === '5173' ? '3001' : window.location.port;
         wsBaseUrl = `${protocol}//${window.location.hostname}:${apiPort}`;
       }
       

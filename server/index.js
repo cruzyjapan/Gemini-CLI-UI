@@ -31,6 +31,7 @@ import http from 'http';
 import cors from 'cors';
 import { promises as fsPromises } from 'fs';
 import { spawn, execSync } from 'child_process';
+import crossSpawn from 'cross-spawn';
 import os from 'os';
 import pty from 'node-pty';
 import fetch from 'node-fetch';
@@ -529,9 +530,11 @@ function handleShellConnection(ws) {
           const geminiPath = process.env.GEMINI_PATH || 'gemini';
           
           // First check if gemini CLI is available
-          try {
-            execSync(`which ${geminiPath}`, { stdio: 'ignore' });
-          } catch (error) {
+          const isWindows = os.platform() === 'win32';
+          const whichCommand = isWindows ? 'where' : 'which';
+          const result = crossSpawn.sync(whichCommand, [geminiPath], { stdio: 'ignore' });
+          
+          if (result.status !== 0) {
             // console.error('❌ Gemini CLI not found in PATH or GEMINI_PATH');
             ws.send(JSON.stringify({
               type: 'output',
@@ -545,15 +548,30 @@ function handleShellConnection(ws) {
           
           if (hasSession && sessionId) {
             // Try to resume session, but with fallback to new session if it fails
-            geminiCommand = `${geminiPath} --resume ${sessionId} || ${geminiPath}`;
+            if (isWindows) {
+              geminiCommand = `if ($LASTEXITCODE -ne 0) { ${geminiPath} } else { ${geminiPath} --resume ${sessionId} }`;
+            } else {
+              geminiCommand = `${geminiPath} --resume ${sessionId} || ${geminiPath}`;
+            }
           }
           
-          // Create shell command that cds to the project directory first
-          const shellCommand = `cd "${projectPath}" && ${geminiCommand}`;
+          // Create shell command that changes to the project directory first
+          let shellCommand;
+          let shell;
+          let shellArgs;
           
+          if (isWindows) {
+            shell = 'powershell.exe';
+            shellCommand = `Set-Location -Path "${projectPath}"; ${geminiCommand}`;
+            shellArgs = ['-Command', shellCommand];
+          } else {
+            shell = 'bash';
+            shellCommand = `cd "${projectPath}" && ${geminiCommand}`;
+            shellArgs = ['-c', shellCommand];
+          }
           
           // Start shell using PTY for proper terminal emulation
-          shellProcess = pty.spawn('bash', ['-c', shellCommand], {
+          shellProcess = pty.spawn(shell, shellArgs, {
             name: 'xterm-256color',
             cols: 80,
             rows: 24,
@@ -997,7 +1015,7 @@ async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden =
   });
 }
 
-const PORT = process.env.PORT || 4008;
+const PORT = process.env.PORT || 3001;
 
 // Initialize database and start server
 async function startServer() {
