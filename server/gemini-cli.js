@@ -320,10 +320,15 @@ async function spawnGemini(command, options = {}, ws) {
         return;
       }
       
-      // console.error('Gemini CLI stderr:', errorMsg);
+      // Treat stderr as part of the response stream
+      fullResponse += (fullResponse ? '\n' : '') + errorMsg;
+      
       ws.send(JSON.stringify({
-        type: 'gemini-error',
-        error: errorMsg
+        type: 'gemini-response',
+        data: {
+          type: 'message',
+          content: errorMsg
+        }
       }));
     });
     

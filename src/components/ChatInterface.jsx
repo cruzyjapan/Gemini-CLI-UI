@@ -1538,20 +1538,48 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
                 }]);
               } else if (part.type === 'text' && part.text?.trim()) {
                 // Add regular text message
-                setChatMessages(prev => [...prev, {
-                  type: 'assistant',
-                  content: part.text,
-                  timestamp: new Date()
-                }]);
+                setChatMessages(prev => {
+                  const lastMessage = prev[prev.length - 1];
+                  if (lastMessage && lastMessage.type === 'assistant' && !lastMessage.isToolUse) {
+                    // Append to the last assistant message
+                    const updatedMessages = [...prev];
+                    updatedMessages[updatedMessages.length - 1] = {
+                      ...lastMessage,
+                      content: lastMessage.content + part.text
+                    };
+                    return updatedMessages;
+                  } else {
+                    // Create a new assistant message
+                    return [...prev, {
+                      type: 'assistant',
+                      content: part.text,
+                      timestamp: new Date()
+                    }];
+                  }
+                });
               }
             }
           } else if (typeof messageData.content === 'string' && messageData.content.trim()) {
             // Add regular text message
-            setChatMessages(prev => [...prev, {
-              type: 'assistant',
-              content: messageData.content,
-              timestamp: new Date()
-            }]);
+            setChatMessages(prev => {
+              const lastMessage = prev[prev.length - 1];
+              if (lastMessage && lastMessage.type === 'assistant' && !lastMessage.isToolUse) {
+                // Append to the last assistant message
+                const updatedMessages = [...prev];
+                updatedMessages[updatedMessages.length - 1] = {
+                  ...lastMessage,
+                  content: lastMessage.content + messageData.content
+                };
+                return updatedMessages;
+              } else {
+                // Create a new assistant message
+                return [...prev, {
+                  type: 'assistant',
+                  content: messageData.content,
+                  timestamp: new Date()
+                }];
+              }
+            });
           }
           
           // Handle tool results from user messages (these come separately)
@@ -1578,11 +1606,25 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
           break;
           
         case 'gemini-output':
-          setChatMessages(prev => [...prev, {
-            type: 'assistant',
-            content: latestMessage.data,
-            timestamp: new Date()
-          }]);
+          setChatMessages(prev => {
+            const lastMessage = prev[prev.length - 1];
+            if (lastMessage && lastMessage.type === 'assistant' && !lastMessage.isToolUse) {
+              // Append to the last assistant message
+              const updatedMessages = [...prev];
+              updatedMessages[updatedMessages.length - 1] = {
+                ...lastMessage,
+                content: lastMessage.content + latestMessage.data
+              };
+              return updatedMessages;
+            } else {
+              // Create a new assistant message
+              return [...prev, {
+                type: 'assistant',
+                content: latestMessage.data,
+                timestamp: new Date()
+              }];
+            }
+          });
           break;
         case 'gemini-interactive-prompt':
           // Handle interactive prompts from CLI
@@ -1633,6 +1675,13 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
           // Clear persisted chat messages after successful completion
           if (selectedProject && latestMessage.exitCode === 0) {
             localStorage.removeItem(`chat_messages_${selectedProject.name}`);
+          }
+
+          // Fetch the latest session messages to ensure the UI is up-to-date
+          if (selectedProject && activeSessionId) {
+            loadSessionMessages(selectedProject.name, activeSessionId).then(messages => {
+              setSessionMessages(messages);
+            });
           }
           break;
           
