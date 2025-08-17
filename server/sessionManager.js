@@ -109,17 +109,17 @@ class SessionManager {
     // Get last N messages for context
     const recentMessages = session.messages.slice(-maxMessages);
     
-    let context = '以下は過去の会話履歴です:\n\n';
+    let context = 'This is the past conversation history:\n\n';
     
     for (const msg of recentMessages) {
       if (msg.role === 'user') {
-        context += `ユーザー: ${msg.content}\n`;
+        context += `User: ${msg.content}\n`;
       } else {
-        context += `アシスタント: ${msg.content}\n`;
+        context += `Assistant: ${msg.content}\n`;
       }
     }
     
-    context += '\n上記の会話履歴を踏まえて、次の質問に答えてください:\n';
+    context += '\nBased on the conversation history above, please answer the next question:\n';
     
     return context;
   }
