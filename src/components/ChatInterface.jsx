@@ -1634,6 +1634,13 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
           if (selectedProject && latestMessage.exitCode === 0) {
             localStorage.removeItem(`chat_messages_${selectedProject.name}`);
           }
+
+          // Fetch the latest session messages to ensure the UI is up-to-date
+          if (selectedProject && activeSessionId) {
+            loadSessionMessages(selectedProject.name, activeSessionId).then(messages => {
+              setSessionMessages(messages);
+            });
+          }
           break;
           
         case 'session-aborted':
