@@ -1578,11 +1578,25 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
           break;
           
         case 'gemini-output':
-          setChatMessages(prev => [...prev, {
-            type: 'assistant',
-            content: latestMessage.data,
-            timestamp: new Date()
-          }]);
+          setChatMessages(prev => {
+            const lastMessage = prev[prev.length - 1];
+            if (lastMessage && lastMessage.type === 'assistant' && !lastMessage.isToolUse) {
+              // Append to the last assistant message
+              const updatedMessages = [...prev];
+              updatedMessages[updatedMessages.length - 1] = {
+                ...lastMessage,
+                content: lastMessage.content + latestMessage.data
+              };
+              return updatedMessages;
+            } else {
+              // Create a new assistant message
+              return [...prev, {
+                type: 'assistant',
+                content: latestMessage.data,
+                timestamp: new Date()
+              }];
+            }
+          });
           break;
         case 'gemini-interactive-prompt':
           // Handle interactive prompts from CLI
