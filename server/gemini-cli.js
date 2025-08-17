@@ -82,7 +82,11 @@ async function spawnGemini(command, options = {}, ws) {
         // Include the full image paths in the prompt for Gemini to reference
         // Gemini CLI can read images from file paths in the prompt
         if (tempImagePaths.length > 0 && command && command.trim()) {
-          const imageNote = `\n\n[画像を添付しました: ${tempImagePaths.length}枚の画像があります。以下のパスに保存されています:]\n${tempImagePaths.map((p, i) => `${i + 1}. ${p}`).join('\n')}`;
+          const imageNote = `
+
+[Attached images: ${tempImagePaths.length} image(s) are available at the following paths:]
+${tempImagePaths.map((p, i) => `${i + 1}. ${p}`).join('
+')}`;
           const modifiedCommand = command + imageNote;
           
           // Update the command in args
