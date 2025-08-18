@@ -464,16 +464,17 @@ function handleChatConnection(ws) {
   connectedClients.add(ws);
   
   ws.on('message', async (message) => {
+    console.log('Received message:', message.toString());
     try {
       const data = JSON.parse(message);
       
-      if (data.type === 'gemini-command') {
-        // console.log('💬 User message:', data.command || '[Continue/Resume]');
-        // console.log('📁 Project:', data.options?.projectPath || 'Unknown');
-        // console.log('🔄 Session:', data.options?.sessionId ? 'Resume' : 'New');
+      if (data.type === 'start-gemini') { // Listen for start-gemini
+        console.log('💬 User message:', data.command || '[Continue/Resume]');
+        console.log('📁 Project:', data.options?.projectPath || 'Unknown');
+        console.log('🔄 Session:', data.options?.sessionId ? 'Resume' : 'New');
         await spawnGemini(data.command, data.options, ws);
       } else if (data.type === 'abort-session') {
-        // console.log('🛑 Abort session request:', data.sessionId);
+        console.log('🛑 Abort session request:', data.sessionId);
         const success = abortGeminiSession(data.sessionId);
         ws.send(JSON.stringify({
           type: 'session-aborted',
@@ -482,7 +483,7 @@ function handleChatConnection(ws) {
         }));
       }
     } catch (error) {
-      // console.error('❌ Chat WebSocket error:', error.message);
+      console.error('❌ Chat WebSocket error:', error.message);
       ws.send(JSON.stringify({
         type: 'error',
         error: error.message
