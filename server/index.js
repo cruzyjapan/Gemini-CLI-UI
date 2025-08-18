@@ -468,10 +468,10 @@ function handleChatConnection(ws) {
     try {
       const data = JSON.parse(message);
       
-      if (data.type === 'start-gemini') { // Listen for start-gemini
-        console.log('💬 User message:', data.command || '[Continue/Resume]');
-        console.log('📁 Project:', data.options?.projectPath || 'Unknown');
-        console.log('🔄 Session:', data.options?.sessionId ? 'Resume' : 'New');
+      if (data.type === 'gemini-command') {
+        // console.log('💬 User message:', data.command || '[Continue/Resume]');
+        // console.log('📁 Project:', data.options?.projectPath || 'Unknown');
+        // console.log('🔄 Session:', data.options?.sessionId ? 'Resume' : 'New');
         await spawnGemini(data.command, data.options, ws);
       } else if (data.type === 'abort-session') {
         console.log('🛑 Abort session request:', data.sessionId);
