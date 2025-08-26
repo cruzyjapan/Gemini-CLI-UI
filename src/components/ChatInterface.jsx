@@ -1426,7 +1426,7 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
         setChatMessages(prev => [...prev, {
           id: `system-${Date.now()}`,
           type: 'system',
-          content: '⚙️ 設定が更新されました。',
+          content: '⚙️ Settings have been updated.',
           timestamp: new Date().toISOString()
         }]);
       }
