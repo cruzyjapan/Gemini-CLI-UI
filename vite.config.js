@@ -9,11 +9,11 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [react()],
     server: {
-      port: parseInt(env.VITE_PORT) || 4009,
+      port: parseInt(env.VITE_PORT) || 5173,
       proxy: {
-        '/api': `http://localhost:${env.PORT || 4008}`,
+        '/api': `http://localhost:${env.PORT || 3001}`,
         '/ws': {
-          target: `ws://localhost:${env.PORT || 4008}`,
+          target: `ws://localhost:${env.PORT || 3001}`,
           ws: true
         }
       }
