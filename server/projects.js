@@ -87,11 +87,18 @@ async function extractProjectDirectory(projectName) {
       // Fall back to decoded project name if no sessions
       // First try to decode from base64
       try {
-        // Handle custom padding: __ at the end should be replaced with ==
-        let base64Name = projectName.replace(/_/g, '+').replace(/-/g, '/');
-        if (base64Name.endsWith('++')) {
+        // Best-effort reversal of a lossy encoding (`/`, `+`, `=` were all replaced with `_`).
+        let base64Name = projectName;
+        // Prioritize trailing underscores as padding (`=`).
+        if (base64Name.endsWith('__')) {
           base64Name = base64Name.slice(0, -2) + '==';
+        } else if (base64Name.endsWith('_')) {
+          base64Name = base64Name.slice(0, -1) + '=';
         }
+        
+        // Assume remaining underscores are the most common case: path separators (`/`).
+        base64Name = base64Name.replace(/_/g, '/');
+
         extractedPath = Buffer.from(base64Name, 'base64').toString('utf8');
         // Clean the path by removing any non-printable characters
         extractedPath = extractedPath.replace(/[^\x20-\x7E]/g, '').trim();
@@ -180,11 +187,18 @@ async function extractProjectDirectory(projectName) {
     // console.error(`Error extracting project directory for ${projectName}:`, error);
     // Fall back to decoded project name
     try {
-      // Handle custom padding: __ at the end should be replaced with ==
-      let base64Name = projectName.replace(/_/g, '+').replace(/-/g, '/');
-      if (base64Name.endsWith('++')) {
+      // Best-effort reversal of a lossy encoding (`/`, `+`, `=` were all replaced with `_`).
+      let base64Name = projectName;
+      // Prioritize trailing underscores as padding (`=`).
+      if (base64Name.endsWith('__')) {
         base64Name = base64Name.slice(0, -2) + '==';
+      } else if (base64Name.endsWith('_')) {
+        base64Name = base64Name.slice(0, -1) + '=';
       }
+      
+      // Assume remaining underscores are the most common case: path separators (`/`).
+      base64Name = base64Name.replace(/_/g, '/');
+
       extractedPath = Buffer.from(base64Name, 'base64').toString('utf8');
       // Clean the path by removing any non-printable characters
       extractedPath = extractedPath.replace(/[^\x20-\x7E]/g, '').trim();
